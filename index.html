@@ -1,0 +1,2153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Professional Registration - Multi-Step Form</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .open-modal-btn {
+        background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 18px;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        transition: all 0.3s ease;
+        font-weight: 600;
+      }
+      .open-modal-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(79, 172, 254, 0.4);
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+      }
+      .modal-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        max-width: 900px;
+        width: 95%;
+        max-height: 90vh;
+        overflow: hidden;
+        animation: modalSlideIn 0.3s ease-out;
+      }
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translate(-50%, -60%);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, -50%);
+        }
+      }
+      .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px 30px 40px;
+        position: relative;
+      }
+      .modal-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 30px 0;
+        text-align: center;
+      }
+      .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 25px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s ease;
+      }
+      .close-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Modern Progress Bar */
+      .progress-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        margin: 0 20px;
+      }
+
+      .progress-line {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        z-index: 1;
+      }
+
+      .progress-line-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+        border-radius: 10px;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 0%;
+        box-shadow: 0 2px 10px rgba(79, 172, 254, 0.4);
+      }
+
+      .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 2;
+        position: relative;
+      }
+
+      .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.7);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 12px;
+        backdrop-filter: blur(10px);
+      }
+
+      .step-circle.active {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border-color: #4facfe;
+        color: white;
+        box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2),
+          0 8px 25px rgba(79, 172, 254, 0.3);
+        transform: scale(1.1);
+      }
+
+      .step-circle.completed {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border-color: #28a745;
+        color: white;
+        box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.2),
+          0 8px 25px rgba(40, 167, 69, 0.3);
+      }
+
+      .step-label {
+        font-size: 12px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
+        max-width: 90px;
+        line-height: 1.3;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .step-label.active {
+        color: white;
+        font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .modal-body {
+        padding: 30px;
+        max-height: calc(90vh - 200px);
+        overflow-y: auto;
+      }
+
+      /* Step Content */
+      .step-content {
+        display: none;
+        animation: fadeIn 0.3s ease-in;
+      }
+      .step-content.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      .form-section {
+        margin-bottom: 30px;
+        padding: 25px;
+        background: #f8faff;
+        border-radius: 15px;
+        border-left: 4px solid #4facfe;
+      }
+      .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+      }
+      .section-title::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background: #4facfe;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #34495e;
+        font-size: 14px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e8ed;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: white;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: #4facfe;
+        box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+      }
+      .form-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e8ed;
+        border-radius: 10px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .form-select:focus {
+        outline: none;
+        border-color: #4facfe;
+        box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+      }
+      .form-textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e8ed;
+        border-radius: 10px;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 80px;
+        font-family: inherit;
+        transition: all 0.3s ease;
+      }
+      .form-textarea:focus {
+        outline: none;
+        border-color: #4facfe;
+        box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+      }
+      .radio-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 10px;
+      }
+      .radio-item {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: background 0.3s ease;
+      }
+      .radio-item:hover {
+        background: rgba(79, 172, 254, 0.1);
+      }
+      .radio-item input[type="radio"] {
+        margin-right: 8px;
+        accent-color: #4facfe;
+      }
+      .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .skill-item {
+        display: flex;
+        align-items: center;
+        background: #e3f2fd;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+      }
+      .skill-remove {
+        background: none;
+        border: none;
+        color: #f44336;
+        margin-left: 8px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .add-skill-btn {
+        background: #4facfe;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 13px;
+        margin-top: 10px;
+        transition: background 0.3s ease;
+      }
+      .add-skill-btn:hover {
+        background: #2196f3;
+      }
+      .add-skill-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .conditional-field {
+        display: none;
+        margin-top: 15px;
+        padding: 15px;
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid #e1e8ed;
+      }
+      .conditional-field.show {
+        display: block;
+      }
+      .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 768px) {
+        .two-column {
+          grid-template-columns: 1fr;
+        }
+        .modal-container {
+          width: 98%;
+          margin: 10px;
+        }
+        .modal-body {
+          padding: 20px;
+        }
+        .radio-group {
+          flex-direction: column;
+        }
+        .progress-container {
+          margin: 0 10px;
+        }
+        .step-label {
+          font-size: 10px;
+          max-width: 70px;
+        }
+        .step-circle {
+          width: 35px;
+          height: 35px;
+          font-size: 14px;
+        }
+      }
+      .required {
+        color: #e74c3c;
+      }
+      .currency-input {
+        position: relative;
+      }
+      .currency-input::before {
+        content: "$";
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        font-weight: bold;
+      }
+      .currency-input input {
+        padding-left: 30px;
+      }
+      .checkbox-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .checkbox-group input[type="checkbox"] {
+        margin-top: 3px;
+        accent-color: #4facfe;
+      }
+      .disclaimer-text {
+        font-size: 12px;
+        line-height: 1.5;
+        color: #666;
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+
+      /* Navigation Buttons */
+      .step-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e1e8ed;
+      }
+      .nav-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 100px;
+      }
+      .btn-prev {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 2px solid #e1e8ed;
+      }
+      .btn-prev:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+      }
+      .btn-prev:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .btn-next {
+        background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+      }
+      .btn-next:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+      }
+      .btn-submit {
+        background: linear-gradient(45deg, #28a745 0%, #20c997 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+      }
+      .btn-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+      }
+      .step-info {
+        text-align: center;
+        color: #6c757d;
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+      .congratulations {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        margin-bottom: 20px;
+      }
+      .congratulations h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      .congratulations p {
+        font-size: 16px;
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="open-modal-btn" onclick="openModal()">
+      Start Professional Registration
+    </button>
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2 class="modal-title">Professional Registration Form</h2>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+          <!-- Modern Progress Bar -->
+          <div class="progress-container">
+            <div class="progress-line">
+              <div class="progress-line-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-step">
+              <div class="step-circle active" id="step1Circle">1</div>
+              <div class="step-label active">User Preferences & Consent</div>
+            </div>
+            <div class="progress-step">
+              <div class="step-circle" id="step2Circle">2</div>
+              <div class="step-label">Technical Consultant Preferences</div>
+            </div>
+            <div class="progress-step">
+              <div class="step-circle" id="step3Circle">3</div>
+              <div class="step-label">Your Preferences & Consent</div>
+            </div>
+            <div class="progress-step">
+              <div class="step-circle" id="step4Circle">4</div>
+              <div class="step-label">Final Consent Section</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body">
+          <form id="registrationForm">
+            <!-- Step 1: User Preferences & Consent -->
+            <div class="step-content active" id="step1">
+              <div class="step-info">
+                Step 1 of 4 - User Preferences & Consent
+              </div>
+              <!-- Professional Information -->
+              <div class="form-section">
+                <h3 class="section-title">Professional Information</h3>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Type of Roles that best describe you or interest you
+                    <span class="required">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-input"
+                    name="roleType"
+                    placeholder="e.g., Java Developer, DevOps Engineer"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Your Core expertise in max 5 Sub skills
+                    <span class="required">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="coreSkillInput"
+                    placeholder="Enter a skill and press Enter"
+                  />
+                  <div class="skills-container" id="coreSkills"></div>
+                  <button type="button" class="add-skill-btn" id="addCoreSkill">
+                    + Add Skill
+                  </button>
+                </div>
+              </div>
+              <!-- US Work Authorization -->
+              <div class="form-section">
+                <h3 class="section-title">US Work Authorization</h3>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Our Client Positions are all US based - Do you currently
+                    reside in United States or will relocate to US?
+                    <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="usResidence"
+                        value="yes"
+                        required
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="usResidence"
+                        value="no"
+                        required
+                      />
+                      <span>No</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="usResidence"
+                        value="relocate"
+                        required
+                      />
+                      <span>Will relocate to US</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="usResidence"
+                        value="others"
+                        required
+                      />
+                      <span>Others</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Are you currently authorized to work in US?
+                    <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="workAuth"
+                        value="yes"
+                        onchange="toggleWorkAuthRemarks()"
+                        required
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="workAuth"
+                        value="no"
+                        onchange="toggleWorkAuthRemarks()"
+                        required
+                      />
+                      <span>No</span>
+                    </label>
+                  </div>
+                  <div class="conditional-field" id="workAuthRemarks">
+                    <label class="form-label"
+                      >User Remarks (e.g., H4 EAD)</label
+                    >
+                    <input
+                      type="text"
+                      class="form-input"
+                      name="workAuthRemarks"
+                      placeholder="Please specify your work authorization status"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Would you need any immigration assistance?
+                    <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="immigrationAssistance"
+                    onchange="toggleImmigrationRemarks(this)"
+                    required
+                  >
+                    <option value="">Select an option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                    <option value="remarks">User Remarks</option>
+                  </select>
+                  <div class="conditional-field" id="immigrationRemarks">
+                    <label class="form-label"
+                      >Please specify your immigration assistance needs</label
+                    >
+                    <textarea
+                      class="form-textarea"
+                      name="immigrationRemarksText"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+              <!-- Experience Details -->
+              <div class="form-section">
+                <h3 class="section-title">Experience Details</h3>
+                <div class="two-column">
+                  <div class="form-group">
+                    <label class="form-label"
+                      >Total Years of Industry Experience
+                      <span class="required">*</span></label
+                    >
+                    <input
+                      type="number"
+                      step="0.1"
+                      class="form-input"
+                      name="industryExperience"
+                      placeholder="e.g., 5.5"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label"
+                      >Total Years of US Experience
+                      <span class="required">*</span></label
+                    >
+                    <input
+                      type="number"
+                      step="0.1"
+                      class="form-input"
+                      name="usExperience"
+                      placeholder="e.g., 3.0"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="two-column">
+                  <div class="form-group">
+                    <label class="form-label"
+                      >Your Current OR Last project Job title
+                      <span class="required">*</span></label
+                    >
+                    <input
+                      type="text"
+                      class="form-input"
+                      name="jobTitle"
+                      placeholder="e.g., Senior Java Developer"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label"
+                      >Your Current / Last End Client name
+                      <span class="required">*</span></label
+                    >
+                    <input
+                      type="text"
+                      class="form-input"
+                      name="clientName"
+                      placeholder="e.g., ABC Corporation"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Your total years of experience in this role
+                    <span class="required">*</span></label
+                  >
+                  <input
+                    type="number"
+                    step="0.1"
+                    class="form-input"
+                    name="roleExperience"
+                    placeholder="e.g., 2.5"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Do you have any domain expertise or worked in more than one
+                    domain (max 3)</label
+                  >
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="domainInput"
+                    placeholder="Enter domain expertise"
+                  />
+                  <div class="skills-container" id="domainSkills"></div>
+                  <button
+                    type="button"
+                    class="add-skill-btn"
+                    id="addDomainSkill"
+                  >
+                    + Add Domain
+                  </button>
+                </div>
+              </div>
+              <!-- Job Preferences -->
+              <div class="form-section">
+                <h3 class="section-title">Job Preferences</h3>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Reason for exploring new Opportunities
+                    <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="opportunityReason"
+                    onchange="toggleOpportunityRemarks(this)"
+                    required
+                  >
+                    <option value="">Select a reason</option>
+                    <option value="current-ending">
+                      Current Project Ending
+                    </option>
+                    <option value="project-over">Project Over</option>
+                    <option value="exploring">
+                      Exploring New Opportunities
+                    </option>
+                    <option value="others">User Remarks / Others</option>
+                  </select>
+                  <div class="conditional-field" id="opportunityRemarks">
+                    <label class="form-label">Please specify your reason</label>
+                    <textarea
+                      class="form-textarea"
+                      name="opportunityRemarksText"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Your Relocation Preferences for Next Job
+                    <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="relocationPreference"
+                    onchange="toggleRelocationRemarks(this)"
+                    required
+                  >
+                    <option value="">Select preference</option>
+                    <option value="local">Need only local job</option>
+                    <option value="relocate">Can Relocate</option>
+                    <option value="others">Others</option>
+                  </select>
+                  <div class="conditional-field" id="relocationRemarks">
+                    <label class="form-label"
+                      >Please specify your relocation preferences</label
+                    >
+                    <textarea
+                      class="form-textarea"
+                      name="relocationRemarksText"
+                      placeholder="Enter your preferences here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Type of Jobs you mostly prefer
+                    <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="jobTypePreference"
+                    onchange="toggleJobTypeRemarks(this)"
+                    required
+                  >
+                    <option value="">Select job type</option>
+                    <option value="remote">Remote</option>
+                    <option value="hybrid">Hybrid</option>
+                    <option value="onsite">Onsite</option>
+                    <option value="depends">Depends on the Opportunity</option>
+                    <option value="others">Others</option>
+                  </select>
+                  <div class="conditional-field" id="jobTypeRemarks">
+                    <label class="form-label"
+                      >Please specify your job type preference</label
+                    >
+                    <textarea
+                      class="form-textarea"
+                      name="jobTypeRemarksText"
+                      placeholder="Enter your preferences here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >The Jobs our clients might bring to you will only be W2 in
+                    nature. Select your preference on how you prefer to work
+                    <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="w2Preference"
+                        value="salary"
+                        onchange="toggleSalaryType()"
+                        required
+                      />
+                      <span>W2 Salary only</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="w2Preference"
+                        value="hourly"
+                        onchange="toggleSalaryType()"
+                        required
+                      />
+                      <span>W2 Hourly only</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="w2Preference"
+                        value="either"
+                        onchange="toggleSalaryType()"
+                        required
+                      />
+                      <span>Either will be fine</span>
+                    </label>
+                  </div>
+                  <div class="conditional-field" id="userInputsW2">
+                    <label class="form-label">User Inputs</label>
+                    <textarea
+                      class="form-textarea"
+                      name="w2PreferenceRemarks"
+                      placeholder="Enter your additional preferences"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Min W2 Salary / W2 Hourly rate below which you won't accept
+                    any offer/opportunity <span class="required">*</span></label
+                  >
+                  <div class="currency-input">
+                    <input
+                      type="number"
+                      class="form-input"
+                      id="minSalary"
+                      name="minSalary"
+                      placeholder="90000"
+                      required
+                    />
+                  </div>
+                  <small id="salaryLabel" style="color: #666; font-size: 12px"
+                    >Annual salary (e.g., $90000/annum)</small
+                  >
+                </div>
+              </div>
+              <!-- Contact Preferences -->
+              <div class="form-section">
+                <h3 class="section-title">Contact Preferences</h3>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Your preferred medium how Recruiters or Sales professionals
+                    / hiring managers should reach you
+                    <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="contactPreference"
+                    onchange="toggleContactRemarks(this)"
+                    required
+                  >
+                    <option value="">Select preference</option>
+                    <option value="phone">Phone only</option>
+                    <option value="email">Email only</option>
+                    <option value="text">Text me first</option>
+                    <option value="either">Either is fine</option>
+                    <option value="others">Others</option>
+                  </select>
+                  <div class="conditional-field" id="contactRemarks">
+                    <label class="form-label"
+                      >Please specify your contact preference</label
+                    >
+                    <textarea
+                      class="form-textarea"
+                      name="contactRemarksText"
+                      placeholder="Enter your preferences here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Should Recruiters not contact you if their Job is below
+                    your expected min Salary or hourly rate?
+                    <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="contactBelow"
+                        value="dont-contact"
+                        required
+                      />
+                      <span>Yes don't contact</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="contactBelow"
+                        value="can-contact"
+                        required
+                      />
+                      <span>No – can still contact</span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top: 15px">
+                    <label class="form-label">User Remarks</label>
+                    <textarea
+                      class="form-textarea"
+                      name="contactBelowRemarks"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Step 2: Technical Consultant Preferences -->
+            <div class="step-content" id="step2">
+              <div class="step-info">
+                Step 2 of 4 - Technical Consultant Preferences
+              </div>
+              <div class="form-section">
+                <h3 class="section-title">Technical Consultant Preferences</h3>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Generally how much notice/time you might need to start any
+                    project / Start new Job
+                    <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="noticeTime"
+                    onchange="toggleNoticeRemarks(this)"
+                    required
+                  >
+                    <option value="">Select timeframe</option>
+                    <option value="1-2-months">Within 1 or 2 months</option>
+                    <option value="1-2-weeks">Within 1-2 weeks</option>
+                    <option value="others">Others</option>
+                  </select>
+                  <div class="conditional-field" id="noticeRemarks">
+                    <label class="form-label"
+                      >Please specify your notice period</label
+                    >
+                    <textarea
+                      class="form-textarea"
+                      name="noticeRemarksText"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Would you be open to go for Face to face interview should
+                    the client want to do that?
+                    <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="faceToFace"
+                        value="yes"
+                        onchange="toggleInterviewRemarks()"
+                        required
+                      />
+                      <span>Yes if needed</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="faceToFace"
+                        value="no"
+                        onchange="toggleInterviewRemarks()"
+                        required
+                      />
+                      <span>No prefer telephonic only</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="faceToFace"
+                        value="advance-notice"
+                        onchange="toggleInterviewRemarks()"
+                        required
+                      />
+                      <span>Need advance notice</span>
+                    </label>
+                  </div>
+                  <div class="conditional-field" id="interviewRemarks">
+                    <label class="form-label">Additional remarks</label>
+                    <textarea
+                      class="form-textarea"
+                      name="interviewRemarksText"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Would you be able to provide at least 3 Client Manager
+                    level references? Our Clients mostly need this before they
+                    hire someone <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="references"
+                    onchange="toggleReferencesRemarks(this)"
+                    required
+                  >
+                    <option value="">Select option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                    <option value="depends">Depends & User Remarks</option>
+                  </select>
+                  <div class="conditional-field" id="referencesRemarks">
+                    <label class="form-label">Please specify</label>
+                    <textarea
+                      class="form-textarea"
+                      name="referencesRemarksText"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Would you be ok to receive New W2 Jobs being announced by
+                    Clients on the same email id used during registration
+                    process – or you would like to get them on an alternate
+                    email id? <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="emailPreference"
+                        value="same"
+                        onchange="toggleAlternateEmail()"
+                        required
+                      />
+                      <span>Yes use same</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="emailPreference"
+                        value="alternate"
+                        onchange="toggleAlternateEmail()"
+                        required
+                      />
+                      <span>No</span>
+                    </label>
+                  </div>
+                  <div class="conditional-field" id="alternateEmailField">
+                    <label class="form-label">Enter alternate email id</label>
+                    <input
+                      type="email"
+                      class="form-input"
+                      name="alternateEmail"
+                      placeholder="alternate@email.com"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Would you be open to take a Client driven Technical Test
+                    prior to being presented to Hiring Manager?
+                    <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="technicalTest"
+                    onchange="toggleTechnicalTestRemarks(this)"
+                    required
+                  >
+                    <option value="">Select option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                    <option value="advance-notice">Need Advance notice</option>
+                  </select>
+                  <div class="conditional-field" id="technicalTestRemarks">
+                    <label class="form-label">Additional Remarks</label>
+                    <textarea
+                      class="form-textarea"
+                      name="technicalTestRemarksText"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Step 3: Your Preferences & Consent -->
+            <div class="step-content" id="step3">
+              <div class="step-info">
+                Step 3 of 4 - Your Preferences & Consent
+              </div>
+              <div class="form-section">
+                <h3 class="section-title">Platform Awareness</h3>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Did you know through our FAQ section that you can change
+                    user preferences through our Change Request section to
+                    –currently Not exploring –& stop getting updates to new jobs
+                    being announced on the platform?
+                    <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="faqAware"
+                    onchange="toggleFAQRemarks(this)"
+                    required
+                  >
+                    <option value="">Select option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                    <option value="others">Others</option>
+                  </select>
+                  <div class="conditional-field" id="faqRemarks">
+                    <label class="form-label">Please specify</label>
+                    <textarea
+                      class="form-textarea"
+                      name="faqRemarksText"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Do you acknowledge that you have been made aware through
+                    our platform that, 99 Networks LLC is only a Search &
+                    Staffing firm having partnered with clients (both End
+                    Clients & Direct to end Client -prime vendors), Staffing
+                    Professionals & IT Professionals & only assists all parties
+                    in hiring the right talent for the Staffing needs of a
+                    client on a W2 basis? <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="acknowledgeCompany"
+                    onchange="toggleAcknowledgeRemarks(this)"
+                    required
+                  >
+                    <option value="">Select option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                    <option value="others">Others</option>
+                  </select>
+                  <div class="conditional-field" id="acknowledgeRemarks">
+                    <label class="form-label">Please specify</label>
+                    <textarea
+                      class="form-textarea"
+                      name="acknowledgeRemarksText"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Did you know –our platform is made to support our Technical
+                    talent –the IT professionals to secure full time jobs &
+                    reducing the number of layers in the value chain –for this
+                    purpose we also encourage our staffing professionals with
+                    attractive benefits to hire talent from our platform?
+                    <span class="required">*</span></label
+                  >
+                  <select
+                    class="form-select"
+                    name="platformPurpose"
+                    onchange="togglePlatformRemarks(this)"
+                    required
+                  >
+                    <option value="">Select option</option>
+                    <option value="yes">Yes – I knew</option>
+                    <option value="no">No –But good to know</option>
+                    <option value="others">Others</option>
+                  </select>
+                  <div class="conditional-field" id="platformRemarks">
+                    <label class="form-label">Please specify</label>
+                    <textarea
+                      class="form-textarea"
+                      name="platformRemarksText"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Did you know we currently don't charge any Joining or
+                    membership fees from its members for utilizing specific
+                    functions like announcing open jobs to members or applying
+                    for any jobs? <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="feesAware"
+                        value="yes"
+                        required
+                      />
+                      <span>Yes –I am aware now</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="feesAware"
+                        value="no"
+                        required
+                      />
+                      <span>No –I wasn't aware</span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top: 15px">
+                    <label class="form-label">User Remarks</label>
+                    <textarea
+                      class="form-textarea"
+                      name="feesAwareRemarks"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Step 4: Final Consent Section -->
+            <div class="step-content" id="step4">
+              <div class="congratulations">
+                <h3>🎉 Congratulations!</h3>
+                <p>Last step left to set you up</p>
+              </div>
+              <div class="form-section">
+                <h3 class="section-title">Final Consent Section</h3>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Do You give your consent that details you submit for any
+                    position / job requirement you learn from Team 99 Networks
+                    LLC or through this platform will be Authentic & True to the
+                    best of your knowledge?
+                    <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="authenticConsent"
+                        value="yes"
+                        required
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="authenticConsent"
+                        value="no"
+                        required
+                      />
+                      <span>No</span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top: 15px">
+                    <label class="form-label">Additional Comments</label>
+                    <textarea
+                      class="form-textarea"
+                      name="authenticConsentRemarks"
+                      placeholder="Enter your comments here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Have you been made aware through our FAQ section –the
+                    discussion on compensation & benefits for any opportunity
+                    will be done directly by the customer & you & 99 Networks
+                    LLC does not get involved in the negotiation process?
+                    <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="compensationAware"
+                        value="yes"
+                        required
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="compensationAware"
+                        value="no"
+                        required
+                      />
+                      <span>No</span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top: 15px">
+                    <label class="form-label">Additional Comments</label>
+                    <textarea
+                      class="form-textarea"
+                      name="compensationAwareRemarks"
+                      placeholder="Enter your comments here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Do you give your consent that you will be ok take a
+                    Background check / Drug test –should the client require you
+                    to do that? <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="backgroundConsent"
+                        value="yes"
+                        required
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="backgroundConsent"
+                        value="no"
+                        required
+                      />
+                      <span>No</span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top: 15px">
+                    <label class="form-label">REMARKS</label>
+                    <textarea
+                      class="form-textarea"
+                      name="backgroundConsentRemarks"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="disclaimer-text">
+                    <strong>Privacy Policy & Confidentiality Agreement:</strong
+                    ><br />
+                    By proceeding, you acknowledge that you have read and agree
+                    to our Privacy Policy and Confidentiality Agreement. These
+                    documents outline how we collect, use, and protect your
+                    personal information, as well as the confidentiality
+                    obligations regarding any proprietary information you may
+                    encounter through our platform.
+                  </div>
+                  <div class="checkbox-group">
+                    <input
+                      type="checkbox"
+                      id="privacyConsent"
+                      name="privacyConsent"
+                      required
+                    />
+                    <label for="privacyConsent" class="form-label"
+                      >Have you been made aware about our cookies & privacy
+                      policy & our confidentiality agreement & do you give your
+                      consent? <span class="required">*</span></label
+                    >
+                  </div>
+                  <div class="radio-group" style="margin-top: 10px">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="privacyAgreement"
+                        value="yes"
+                        required
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="privacyAgreement"
+                        value="no"
+                        required
+                      />
+                      <span>No</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="privacyAgreement"
+                        value="others"
+                        required
+                      />
+                      <span>Others</span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top: 15px">
+                    <label class="form-label">Additional Comments</label>
+                    <textarea
+                      class="form-textarea"
+                      name="privacyAgreementRemarks"
+                      placeholder="Enter your comments here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Do you give your consent that you will promptly notify the
+                    client if you decide to pursue some other offers /
+                    opportunities & not accept our clients position?
+                    <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="notifyConsent"
+                        value="yes"
+                        required
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="notifyConsent"
+                        value="no"
+                        required
+                      />
+                      <span>No</span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top: 15px">
+                    <label class="form-label">Additional Remarks</label>
+                    <textarea
+                      class="form-textarea"
+                      name="notifyConsentRemarks"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Do you give your consent that you will not learn an
+                    opportunity from the platform or divert it to another party
+                    or directly compete for the same after learning through the
+                    platform either directly or indirectly through a third party
+                    as this could cause irreparable damage to our customer
+                    business / Manager relationships for which they could hold
+                    all parties liable for damages?
+                    <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="nonCompeteConsent"
+                        value="yes"
+                        required
+                      />
+                      <span>Yes –I give my consent</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="nonCompeteConsent"
+                        value="no"
+                        required
+                      />
+                      <span>No -I don't give my consent</span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top: 15px">
+                    <label class="form-label">Additional Remarks</label>
+                    <textarea
+                      class="form-textarea"
+                      name="nonCompeteConsentRemarks"
+                      placeholder="Enter your remarks here"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Do you give your consent to receive New W2 Jobs being
+                    announced by Clients on your email registered while logging
+                    in or you would prefer getting these on an alternate email
+                    id? <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="jobEmailConsent"
+                        value="yes"
+                        onchange="toggleJobEmailAlternate()"
+                        required
+                      />
+                      <span>Yes –I give my consent</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="jobEmailConsent"
+                        value="no"
+                        onchange="toggleJobEmailAlternate()"
+                        required
+                      />
+                      <span>No -I don't give my consent</span>
+                    </label>
+                  </div>
+                  <div class="conditional-field" id="jobEmailAlternate">
+                    <label class="form-label">Alternate email id to use</label>
+                    <input
+                      type="email"
+                      class="form-input"
+                      name="jobEmailAlternateEmail"
+                      placeholder="alternate@email.com"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label"
+                    >Do you give your consent to 99 Networks LLC or its
+                    representative employees to represent your candidature for
+                    the opportunity they bring to you?
+                    <span class="required">*</span></label
+                  >
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="representationConsent"
+                        value="yes"
+                        required
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="representationConsent"
+                        value="no"
+                        required
+                      />
+                      <span>No</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="disclaimer-text">
+                    <strong>Disclaimer:</strong> Do you understand & acknowledge
+                    –99 Networks LLC & its India based group company –Network 99
+                    Outsourcing Services only offer this service to its members
+                    to reach out to concerned managers regarding any
+                    opportunities they see that are announced on the platform &
+                    the two companies cannot be held liable for any information
+                    sent by a candidate /applicant to the HR Professional or the
+                    concerned representative who had announced the job on the
+                    platform. All organizations are required to do the due
+                    diligence at their end, conduct Background checks using
+                    their own organizations resources for this purposes.
+                  </div>
+                  <div class="radio-group">
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="disclaimerAcknowledge"
+                        value="yes"
+                        required
+                      />
+                      <span>Yes –I acknowledge & accept</span>
+                    </label>
+                    <label class="radio-item">
+                      <input
+                        type="radio"
+                        name="disclaimerAcknowledge"
+                        value="no"
+                        required
+                      />
+                      <span>No –I have a question</span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="margin-top: 15px">
+                    <label class="form-label">Questions or Comments</label>
+                    <textarea
+                      class="form-textarea"
+                      name="disclaimerQuestions"
+                      placeholder="Enter your questions or comments here"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Navigation Buttons -->
+            <div class="step-navigation">
+              <button
+                type="button"
+                class="nav-btn btn-prev"
+                id="prevBtn"
+                onclick="changeStep(-1)"
+                disabled
+              >
+                ← Previous
+              </button>
+              <div style="text-align: center; color: #666; font-size: 14px">
+                Step <span id="currentStepNum">1</span> of 4
+              </div>
+              <button
+                type="button"
+                class="nav-btn btn-next"
+                id="nextBtn"
+                onclick="changeStep(1)"
+              >
+                Next →
+              </button>
+              <button
+                type="submit"
+                class="nav-btn btn-submit"
+                id="submitBtn"
+                style="display: none"
+              >
+                Complete Registration
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      let currentStep = 1;
+      const totalSteps = 4;
+      let coreSkills = [];
+      let domainSkills = [];
+      // Modal functions
+      function openModal() {
+        document.getElementById("modalOverlay").style.display = "block";
+        document.body.style.overflow = "hidden";
+      }
+      function closeModal() {
+        document.getElementById("modalOverlay").style.display = "none";
+        document.body.style.overflow = "auto";
+      }
+      // Close modal when clicking outside
+      document
+        .getElementById("modalOverlay")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeModal();
+          }
+        });
+      // Step navigation
+      function changeStep(direction) {
+        if (direction === 1 && !validateCurrentStep()) {
+          return;
+        }
+        const newStep = currentStep + direction;
+        if (newStep >= 1 && newStep <= totalSteps) {
+          // Hide current step
+          document
+            .getElementById(`step${currentStep}`)
+            .classList.remove("active");
+          document
+            .getElementById(`step${currentStep}Circle`)
+            .classList.remove("active");
+          // Mark current step as completed if moving forward
+          if (direction === 1) {
+            document
+              .getElementById(`step${currentStep}Circle`)
+              .classList.add("completed");
+            document.getElementById(`step${currentStep}Circle`).innerHTML = "✓";
+          }
+          // Show new step
+          currentStep = newStep;
+          document.getElementById(`step${currentStep}`).classList.add("active");
+          document
+            .getElementById(`step${currentStep}Circle`)
+            .classList.add("active");
+          // Update progress bar
+          updateProgressBar();
+          // Update navigation buttons
+          updateNavigationButtons();
+          // Update step counter
+          document.getElementById("currentStepNum").textContent = currentStep;
+          // Scroll to top
+          document.querySelector(".modal-body").scrollTop = 0;
+        }
+      }
+      function updateProgressBar() {
+        const progressPercentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
+        document.getElementById("progressFill").style.width =
+          progressPercentage + "%";
+        // Update step labels
+        for (let i = 1; i <= totalSteps; i++) {
+          const label = document.querySelector(
+            `#step${i}Circle`
+          ).nextElementSibling;
+          if (i === currentStep) {
+            label.classList.add("active");
+          } else {
+            label.classList.remove("active");
+          }
+        }
+      }
+      function updateNavigationButtons() {
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const submitBtn = document.getElementById("submitBtn");
+        prevBtn.disabled = currentStep === 1;
+        if (currentStep === totalSteps) {
+          nextBtn.style.display = "none";
+          submitBtn.style.display = "block";
+        } else {
+          nextBtn.style.display = "block";
+          submitBtn.style.display = "none";
+        }
+      }
+      function validateCurrentStep() {
+        const currentStepElement = document.getElementById(
+          `step${currentStep}`
+        );
+        const requiredFields =
+          currentStepElement.querySelectorAll("[required]");
+        let isValid = true;
+        let firstInvalidField = null;
+        requiredFields.forEach((field) => {
+          let fieldValid = true;
+          if (field.type === "radio") {
+            const radioGroup = currentStepElement.querySelectorAll(
+              `input[name="${field.name}"]`
+            );
+            const isChecked = Array.from(radioGroup).some(
+              (radio) => radio.checked
+            );
+            fieldValid = isChecked;
+          } else if (field.type === "checkbox") {
+            fieldValid = field.checked;
+          } else {
+            fieldValid = field.value.trim() !== "";
+          }
+          if (!fieldValid) {
+            isValid = false;
+            if (!firstInvalidField) {
+              firstInvalidField = field;
+            }
+            if (field.type !== "radio" && field.type !== "checkbox") {
+              field.style.borderColor = "#e74c3c";
+            }
+          } else {
+            if (field.type !== "radio" && field.type !== "checkbox") {
+              field.style.borderColor = "#e1e8ed";
+            }
+          }
+        });
+        // Special validation for core skills in step 1
+        if (currentStep === 1 && coreSkills.length === 0) {
+          isValid = false;
+          alert("Please add at least one core skill.");
+          return false;
+        }
+        if (!isValid) {
+          alert("Please fill in all required fields before proceeding.");
+          if (firstInvalidField) {
+            firstInvalidField.focus();
+          }
+        }
+        return isValid;
+      }
+      // Skills management
+      function addSkill(type, skillText) {
+        const maxSkills = type === "core" ? 5 : 3;
+        const skillsArray = type === "core" ? coreSkills : domainSkills;
+        const containerId = type === "core" ? "coreSkills" : "domainSkills";
+        const buttonId = type === "core" ? "addCoreSkill" : "addDomainSkill";
+        if (skillText.trim() && skillsArray.length < maxSkills) {
+          skillsArray.push(skillText.trim());
+          updateSkillsDisplay(type, containerId);
+          document.getElementById(buttonId).disabled =
+            skillsArray.length >= maxSkills;
+        }
+      }
+      function removeSkill(type, index) {
+        const skillsArray = type === "core" ? coreSkills : domainSkills;
+        const containerId = type === "core" ? "coreSkills" : "domainSkills";
+        const buttonId = type === "core" ? "addCoreSkill" : "addDomainSkill";
+        skillsArray.splice(index, 1);
+        updateSkillsDisplay(type, containerId);
+        document.getElementById(buttonId).disabled = false;
+      }
+      function updateSkillsDisplay(type, containerId) {
+        const skillsArray = type === "core" ? coreSkills : domainSkills;
+        const container = document.getElementById(containerId);
+        container.innerHTML = skillsArray
+          .map(
+            (skill, index) =>
+              `<div class="skill-item">
+                    ${skill}
+                    <button type="button" class="skill-remove" onclick="removeSkill('${type}', ${index})">×</button>
+                </div>`
+          )
+          .join("");
+      }
+      // Core skills event listeners
+      document
+        .getElementById("addCoreSkill")
+        .addEventListener("click", function () {
+          const input = document.getElementById("coreSkillInput");
+          addSkill("core", input.value);
+          input.value = "";
+        });
+      document
+        .getElementById("coreSkillInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            addSkill("core", this.value);
+            this.value = "";
+          }
+        });
+      // Domain skills event listeners
+      document
+        .getElementById("addDomainSkill")
+        .addEventListener("click", function () {
+          const input = document.getElementById("domainInput");
+          addSkill("domain", input.value);
+          input.value = "";
+        });
+      document
+        .getElementById("domainInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            addSkill("domain", this.value);
+            this.value = "";
+          }
+        });
+      // Conditional field toggle functions
+      function toggleWorkAuthRemarks() {
+        const workAuthValue = document.querySelector(
+          'input[name="workAuth"]:checked'
+        )?.value;
+        const remarksField = document.getElementById("workAuthRemarks");
+        if (workAuthValue === "no") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleImmigrationRemarks(select) {
+        const remarksField = document.getElementById("immigrationRemarks");
+        if (select.value === "remarks") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleOpportunityRemarks(select) {
+        const remarksField = document.getElementById("opportunityRemarks");
+        if (select.value === "others") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleRelocationRemarks(select) {
+        const remarksField = document.getElementById("relocationRemarks");
+        if (select.value === "others") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleJobTypeRemarks(select) {
+        const remarksField = document.getElementById("jobTypeRemarks");
+        if (select.value === "others") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleSalaryType() {
+        const w2Preference = document.querySelector(
+          'input[name="w2Preference"]:checked'
+        )?.value;
+        const userInputsField = document.getElementById("userInputsW2");
+        const salaryInput = document.getElementById("minSalary");
+        const salaryLabel = document.getElementById("salaryLabel");
+        if (w2Preference === "either") {
+          userInputsField.classList.add("show");
+        } else {
+          userInputsField.classList.remove("show");
+        }
+        // Update salary input placeholder and label
+        if (w2Preference === "hourly") {
+          salaryInput.placeholder = "55";
+          salaryLabel.textContent = "Hourly rate (e.g., $55/hr)";
+        } else {
+          salaryInput.placeholder = "90000";
+          salaryLabel.textContent = "Annual salary (e.g., $90000/annum)";
+        }
+      }
+      function toggleContactRemarks(select) {
+        const remarksField = document.getElementById("contactRemarks");
+        if (select.value === "others") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleNoticeRemarks(select) {
+        const remarksField = document.getElementById("noticeRemarks");
+        if (select.value === "others") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleInterviewRemarks() {
+        const faceToFaceValue = document.querySelector(
+          'input[name="faceToFace"]:checked'
+        )?.value;
+        const remarksField = document.getElementById("interviewRemarks");
+        if (faceToFaceValue === "advance-notice") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleReferencesRemarks(select) {
+        const remarksField = document.getElementById("referencesRemarks");
+        if (select.value === "depends") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleAlternateEmail() {
+        const emailPreference = document.querySelector(
+          'input[name="emailPreference"]:checked'
+        )?.value;
+        const alternateField = document.getElementById("alternateEmailField");
+        if (emailPreference === "alternate") {
+          alternateField.classList.add("show");
+        } else {
+          alternateField.classList.remove("show");
+        }
+      }
+      function toggleTechnicalTestRemarks(select) {
+        const remarksField = document.getElementById("technicalTestRemarks");
+        if (select.value === "advance-notice") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleFAQRemarks(select) {
+        const remarksField = document.getElementById("faqRemarks");
+        if (select.value === "others") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleAcknowledgeRemarks(select) {
+        const remarksField = document.getElementById("acknowledgeRemarks");
+        if (select.value === "others") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function togglePlatformRemarks(select) {
+        const remarksField = document.getElementById("platformRemarks");
+        if (select.value === "others") {
+          remarksField.classList.add("show");
+        } else {
+          remarksField.classList.remove("show");
+        }
+      }
+      function toggleJobEmailAlternate() {
+        const jobEmailConsent = document.querySelector(
+          'input[name="jobEmailConsent"]:checked'
+        )?.value;
+        const alternateField = document.getElementById("jobEmailAlternate");
+        if (jobEmailConsent === "no") {
+          alternateField.classList.add("show");
+        } else {
+          alternateField.classList.remove("show");
+        }
+      }
+      // Form submission
+      document
+        .getElementById("registrationForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          if (!validateCurrentStep()) {
+            return;
+          }
+          // Collect all form data
+          const formData = new FormData(this);
+          // Add skills data
+          formData.append("coreSkills", JSON.stringify(coreSkills));
+          formData.append("domainSkills", JSON.stringify(domainSkills));
+          // Show success message
+          alert(
+            "🎉 Registration completed successfully! Thank you for joining our platform. You will receive a confirmation email shortly."
+          );
+          // Close modal and reset form
+          closeModal();
+          this.reset();
+          // Reset step navigation
+          currentStep = 1;
+          coreSkills = [];
+          domainSkills = [];
+          // Reset UI
+          for (let i = 1; i <= totalSteps; i++) {
+            document.getElementById(`step${i}`).classList.remove("active");
+            document
+              .getElementById(`step${i}Circle`)
+              .classList.remove("active", "completed");
+            document.getElementById(`step${i}Circle`).innerHTML = i;
+          }
+          document.getElementById("step1").classList.add("active");
+          document.getElementById("step1Circle").classList.add("active");
+          updateProgressBar();
+          updateNavigationButtons();
+          document.getElementById("currentStepNum").textContent = "1";
+          updateSkillsDisplay("core", "coreSkills");
+          updateSkillsDisplay("domain", "domainSkills");
+          // Hide all conditional fields
+          document.querySelectorAll(".conditional-field").forEach((field) => {
+            field.classList.remove("show");
+          });
+        });
+      // Initialize the form
+      updateProgressBar();
+      updateNavigationButtons();
+      // Keyboard navigation
+      document.addEventListener("keydown", function (e) {
+        if (document.getElementById("modalOverlay").style.display === "block") {
+          if (e.key === "Escape") {
+            closeModal();
+          } else if (e.key === "ArrowLeft" && currentStep > 1) {
+            changeStep(-1);
+          } else if (e.key === "ArrowRight" && currentStep < totalSteps) {
+            if (validateCurrentStep()) {
+              changeStep(1);
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
